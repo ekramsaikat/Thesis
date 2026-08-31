@@ -452,3 +452,71 @@ write_xlsx(
   "Renal_Admission_All_District_Added.xlsx"
 )
 getwd()
+
+library(readxl)
+Renal_Admission_Final_2021_2025 <- read_excel("Renal_Admission_Final_2021_2025.xlsx")
+View(Renal_Admission_Final_2021_2025)
+
+
+library(dplyr)
+
+Renal_Admission_Final_2021_2025 <- Renal_Admission_Final_2021_2025 %>%
+  mutate(
+    `In District` = if_else(
+      is.na(`in_District`) | trimws(`in_District`) == "",
+      District,
+      `in_District`
+    )
+  )
+
+missing <- is.na(Renal_Admission_Final_2021_2025$`In District`) |
+  trimws(Renal_Admission_Final_2021_2025$`In District`) == ""
+
+
+
+names(Renal_Admission_Final_2021_2025)[
+  names(Renal_Admission_Final_2021_2025) == "In District"
+] <- "In_District"
+
+
+
+Renal_Admission_Final_2021_2025$Division <-
+  Report_2026_08_31_00_58_18$Division[
+    match(
+      Renal_Admission_Final_2021_2025$In_District,
+      Report_2026_08_31_00_58_18$District
+    )
+  ]
+table(
+  Renal_Admission_Final_2021_2025$Division,
+  useNA = "ifany"
+)
+
+unique(
+  Renal_Admission_Final_2021_2025$In_District[
+    is.na(Renal_Admission_Final_2021_2025$Division)
+  ]
+)
+
+Renal_Admission_Final_2021_2025$In_District[
+  Renal_Admission_Final_2021_2025$In_District == "Chapai Nawabganj"
+] <- "Chapainawabganj"
+
+Renal_Admission_Final_2021_2025$Division <-
+  Report_2026_08_31_00_58_18$Division[
+    match(
+      Renal_Admission_Final_2021_2025$In_District,
+      Report_2026_08_31_00_58_18$District
+    )
+  ]
+table(
+  Renal_Admission_Final_2021_2025$Division,
+  useNA = "ifany"
+)
+
+library(writexl)
+
+write_xlsx(
+  Renal_Admission_Final_2021_2025,
+  "Renal_Admission_Final_2021_2025_District_Division.xlsx"
+)
